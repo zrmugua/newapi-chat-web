@@ -59,9 +59,9 @@ https://chat.example.com/?apiUrl=https://api.example.com&apiKey={key}&model=deep
 
 ## 部署与自动更新
 
-点击页面顶部的 Vercel 按钮，授权 GitHub 并创建项目即可开始部署。仓库中的 `vercel.json` 已设置构建命令与输出目录，使用 Node.js 24。
+点击页面顶部的 Vercel 按钮，授权 GitHub 并创建项目即可开始部署。该按钮会将本仓库克隆为你账号下的新 Git 仓库，再从副本创建 Vercel 项目。若你已经拥有本仓库，并希望 Vercel 直接部署它，请在 Vercel 控制台选择导入现有 Git 仓库，再选择 `newapi-chat-web`。仓库中的 `vercel.json` 已设置构建命令与输出目录，使用 Node.js 24。
 
-首次部署后，Vercel 会关联 GitHub 仓库。提交并推送到 `main` 会自动构建并更新正式站点；其他分支和 Pull Request 会生成预览部署。日常更新项目后执行：
+首次部署后，Vercel 会关联创建项目时选择的 GitHub 仓库。使用一键部署按钮时，关联的是按钮克隆生成的新仓库；导入现有仓库时，关联的是你选择的原仓库。向所关联仓库的 `main` 分支推送会自动构建并更新正式站点；其他分支和 Pull Request 会生成预览部署。日常更新前，确认本地 `origin` 指向 Vercel 所关联的仓库，再执行：
 
 ```sh
 git add .

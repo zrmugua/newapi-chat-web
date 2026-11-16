@@ -16,11 +16,11 @@ pnpm test
 pnpm build
 ```
 
-Use Node.js 24. Production files are written to `dist/`. The Vercel button above creates a Vercel project from this repository; `vercel.json` configures the build and output directory. Public defaults can be set through `CHAT_API_BASE_URL` and `CHAT_DEFAULT_MODEL`.
+Use Node.js 24. Production files are written to `dist/`. The Vercel button above clones this repository into a new Git repository in your account and creates a Vercel project from that copy; `vercel.json` configures the build and output directory. If you already own this repository and want Vercel to deploy it directly, import the existing repository from the Vercel dashboard instead. Public defaults can be set through `CHAT_API_BASE_URL` and `CHAT_DEFAULT_MODEL`.
 
 ## Deployment and updates
 
-After the first deployment, Vercel connects to the GitHub repository. Pushing to `main` automatically builds and updates production; other branches and pull requests receive preview deployments. To publish an update:
+After the first deployment, Vercel connects to the Git repository selected during setup. Pushing to its `main` branch automatically builds and updates production; other branches and pull requests receive preview deployments. With the Deploy button, this is the new repository created by the clone flow. If you imported an existing repository, pushes to that repository's `main` branch trigger updates. To publish an update from a local checkout, make sure `origin` points to the repository connected to Vercel, then run:
 
 ```sh
 git add .
