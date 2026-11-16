@@ -14,7 +14,7 @@ import {
   useDrafts,
 } from '../../services/chat/drafts.js'
 import { IconButton } from '../base/IconButton.js'
-import { ensureApiKey } from '../settings/settingsDialogState.js'
+import { ensureApiKey, openSettings } from '../settings/settingsDialogState.js'
 import { DragMask, useFileDrop } from './DragMask.js'
 import { showToast } from '../base/toastState.js'
 import { ACCEPT, useUploads } from '../../services/attachments.js'
@@ -82,7 +82,15 @@ const Input = ({ sessionId }: { sessionId: string | null }) => {
       return
     }
     // 文本与上传完成态由提交动作读取最新快照，不使用上一次渲染的草稿。
-    if (!ensureApiKey() || !sendMessage(sessionId)) {
+    if (!ensureApiKey()) {
+      return
+    }
+    if (!useSettings.getState().model) {
+      openSettings('connection')
+      showToast({ key: 'modelRequired', type: 'error' })
+      return
+    }
+    if (!sendMessage(sessionId)) {
       return
     }
     if (isMobile) {

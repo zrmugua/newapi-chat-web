@@ -3,6 +3,7 @@ import { useTranslate } from '../../i18n/index.js'
 import { loadModels } from '../../services/api/client.js'
 import { normalizeBaseUrl, type ApiProtocol } from '../../services/connection.js'
 import {
+  resolveAvailableModel,
   setApiKey,
   setConnection,
   setModel,
@@ -11,6 +12,7 @@ import {
 } from '../../services/settings.js'
 import { Button } from '../base/Button.js'
 import { Select } from '../base/Select.js'
+import { IconCheckOutline16 } from '../base/icons.js'
 import { showToast } from '../base/toastState.js'
 import styles from './ConnectionSettings.module.css'
 
@@ -39,8 +41,9 @@ export const ConnectionSettings = () => {
         return
       }
       setModels(result)
-      if (!model && result[0]) {
-        setModelValue(result[0])
+      const availableModel = result.length ? resolveAvailableModel(model, result) : model
+      if (availableModel !== model) {
+        setModelValue(availableModel)
       }
       if (result.length === 0) {
         setError(t('modelsEmpty'))
@@ -127,13 +130,13 @@ export const ConnectionSettings = () => {
           </button>
         </div>
       </div>
-      <label className={styles.field}>
-        <span>{t('chatModel')}</span>
+      <div className={styles.field}>
+        <label htmlFor="connection-model">{t('chatModel')}</label>
         <div className={styles.modelRow}>
           <input
-            list="connection-models"
+            id="connection-model"
             value={model}
-            placeholder="deepseek-chat"
+            placeholder={t('modelIdPlaceholder')}
             spellCheck={false}
             onChange={(e) => setModelValue(e.target.value)}
           />
@@ -146,13 +149,27 @@ export const ConnectionSettings = () => {
             {t(busy ? 'modelsLoading' : 'fetchModels')}
           </Button>
         </div>
-        <datalist id="connection-models">
-          {models.map((value) => (
-            <option key={value} value={value} />
-          ))}
-        </datalist>
+        {models.length ? (
+          <div className={styles.modelList} role="group" aria-label={t('availableModels')}>
+            <span className={styles.modelListTitle}>{t('availableModels')}</span>
+            <div className={styles.modelOptions}>
+              {models.map((value) => (
+                <button
+                  key={value}
+                  type="button"
+                  className={`${styles.modelOption} ${model === value ? styles.modelOptionSelected : ''}`}
+                  aria-pressed={model === value}
+                  onClick={() => setModelValue(value)}
+                >
+                  <span>{value}</span>
+                  {model === value ? <IconCheckOutline16 /> : null}
+                </button>
+              ))}
+            </div>
+          </div>
+        ) : null}
         <small>{t('modelHelp')}</small>
-      </label>
+      </div>
       {error ? (
         <p className={styles.error} role="alert">
           {error}

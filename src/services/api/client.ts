@@ -73,5 +73,5 @@ export const loadModels = async (
         typeof model?.id === 'string' && model.id.trim() ? [model.id] : []
       )
     ),
-  ].sort()
+  ]
 }

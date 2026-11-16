@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import type { CreateMessageRequest, MessageStreamEvent } from '../src/services/api/types.ts'
 
-Object.assign(globalThis, { __API_ORIGIN__: '', __DEFAULT_MODEL__: 'deepseek-chat' })
+Object.assign(globalThis, { __API_ORIGIN__: '' })
 const { streamMessage, toOpenAIMessages } = await import('../src/services/api/openai.ts')
 const { ApiError, loadModels } = await import('../src/services/api/client.ts')
 const body: CreateMessageRequest = {
@@ -152,11 +152,11 @@ test('history conversion keeps ordinary turns and continues a partial answer', a
   assert.ok(!JSON.stringify(result).includes('private reasoning'))
 })
 
-test('model list uses the current gateway and returns unique IDs', async (t) => {
+test('model list preserves gateway order and returns unique IDs', async (t) => {
   t.mock.method(globalThis, 'fetch', async () =>
     Response.json({ data: [{ id: 'b' }, { id: 'a' }, { id: 'a' }, {}] })
   )
-  assert.deepEqual(await loadModels(connection), ['a', 'b'])
+  assert.deepEqual(await loadModels(connection), ['b', 'a'])
 })
 
 test('Chat Completions forwards reasoning levels and requests streamed token usage', async (t) => {

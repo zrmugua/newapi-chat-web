@@ -69,7 +69,7 @@ const initialEffort = (): ReasoningEffort => {
 export const useSettings = create<Settings>(() => ({
   apiKey: read(KEYS.apiKey),
   baseUrl: read(KEYS.baseUrl) ?? __API_ORIGIN__,
-  model: read(KEYS.model) || __DEFAULT_MODEL__,
+  model: read(KEYS.model) ?? '',
   models: [],
   protocol: read(KEYS.protocol) === 'responses' ? 'responses' : 'chat-completions',
   reasoningEffort: initialEffort(),
@@ -104,6 +104,10 @@ export const setModel = (model: string) => {
   write(KEYS.model, value)
   useSettings.setState({ model: value })
 }
+
+export const resolveAvailableModel = (current: string, models: string[]) =>
+  models.includes(current) ? current : (models[0] ?? '')
+
 export const setProtocol = (protocol: ApiProtocol) => {
   write(KEYS.protocol, protocol)
   useSettings.setState({ protocol })

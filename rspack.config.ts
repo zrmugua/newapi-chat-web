@@ -82,7 +82,6 @@ export const createConfig = ({
     }),
     new rspack.DefinePlugin({
       __API_ORIGIN__: JSON.stringify(apiOrigin),
-      __DEFAULT_MODEL__: JSON.stringify(process.env.CHAT_DEFAULT_MODEL || 'deepseek-chat'),
     }),
     new rspack.CopyRspackPlugin({
       patterns: [{ from: path.resolve(root, 'LICENSE'), to: 'LICENSE', toType: 'file' }],

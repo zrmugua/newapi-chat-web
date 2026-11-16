@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import type { CreateMessageRequest, MessageStreamEvent } from '../src/services/api/types.ts'
 
-Object.assign(globalThis, { __API_ORIGIN__: '', __DEFAULT_MODEL__: 'deepseek-chat' })
+Object.assign(globalThis, { __API_ORIGIN__: '' })
 const { streamMessage, toResponsesInput } = await import('../src/services/api/openai.ts')
 const { ApiError } = await import('../src/services/api/client.ts')
 const connection = { baseUrl: 'https://gateway.example/v1', apiKey: 'sk-test' }

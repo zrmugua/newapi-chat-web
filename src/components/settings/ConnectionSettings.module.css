@@ -61,6 +61,47 @@
 .modelRow > button {
   flex-shrink: 0;
 }
+.modelList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.modelListTitle {
+  color: var(--dsw-alias-label-secondary);
+  font-size: 12px;
+}
+.modelOptions {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 180px), 1fr));
+  gap: 6px;
+  max-height: 176px;
+  overflow: auto;
+}
+.modelOption {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-width: 0;
+  min-height: 36px;
+  padding: 7px 9px;
+  border: 1px solid var(--dsw-alias-border-l2-darkmode-thin);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--dsw-alias-label-primary);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.modelOption span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.modelOptionSelected {
+  border-color: var(--dsw-alias-label-primary);
+  background: var(--dsw-alias-interactive-bg-hover);
+}
 .error {
   margin: 0;
   color: #d34b4b;

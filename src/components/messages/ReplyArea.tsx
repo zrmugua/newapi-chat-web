@@ -134,6 +134,7 @@ const StepItem = ({
             loading={thinking}
             cacheKey={`${message.id}-${step.key}`}
             disableLink
+            allowCodePreviews={false}
           />
         </ContentItem>
       )

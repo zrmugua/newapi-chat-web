@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
 
-Object.assign(globalThis, { __API_ORIGIN__: '', __DEFAULT_MODEL__: 'deepseek-chat' })
+Object.assign(globalThis, { __API_ORIGIN__: '' })
 const memory = new Map<string, string>()
 Object.assign(globalThis, {
   localStorage: {
@@ -11,7 +11,8 @@ Object.assign(globalThis, {
   },
 })
 const { readPreset, cleanPresetUrl, importPreset } = await import('../src/services/preset.ts')
-const { useSettings, setConnection } = await import('../src/services/settings.ts')
+const { useSettings, setConnection, resolveAvailableModel } =
+  await import('../src/services/settings.ts')
 const locate = (href: string) => {
   const location = { href }
   Object.assign(globalThis, {
@@ -27,6 +28,13 @@ const locate = (href: string) => {
   })
   return location
 }
+
+test('starts without a fixed model and defaults to the first available model', () => {
+  assert.equal(useSettings.getState().model, '')
+  assert.equal(resolveAvailableModel('', ['first', 'second']), 'first')
+  assert.equal(resolveAvailableModel('second', ['first', 'second']), 'second')
+  assert.equal(resolveAvailableModel('missing', []), '')
+})
 
 test('imports screenshot-style and percent-encoded New API presets', () => {
   const preset = readPreset(

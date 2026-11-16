@@ -13,7 +13,8 @@ export const ModelPicker = () => {
       className={styles.picker}
       value={model}
       ariaLabel={t('chatModel')}
-      options={[...new Set([model, ...models])].map((value) => ({ value, label: value }))}
+      placeholder={t('modelSelectPlaceholder')}
+      options={models.map((value) => ({ value, label: value }))}
       onChange={setModel}
     />
   ) : (
@@ -23,7 +24,7 @@ export const ModelPicker = () => {
       onClick={() => openSettings('connection')}
       title={t('chatModel')}
     >
-      {model}
+      {model || t('modelSelectPlaceholder')}
       <span aria-hidden>⌄</span>
     </button>
   )

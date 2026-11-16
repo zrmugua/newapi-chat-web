@@ -76,10 +76,12 @@ export const CodeBlock = memo(function CodeBlock({
   code,
   infostring,
   loading = false,
+  allowCodePreviews = true,
 }: {
   code: string
   infostring: string
   loading?: boolean
+  allowCodePreviews?: boolean
 }) {
   const isMermaid = infostring.toLowerCase() === 'mermaid'
   const kind = previewKind(infostring, code)
@@ -106,7 +108,7 @@ export const CodeBlock = memo(function CodeBlock({
     const name = lang !== null && loaded ? lang : 'plaintext'
     return Prism.highlight(code, Prism.languages[name], name)
   }, [code, lang, loaded])
-  if (kind) {
+  if (kind && allowCodePreviews) {
     return <ArtifactPreview code={code} kind={kind} loading={loading} sourceHtml={renderedHtml} />
   }
   return (
@@ -116,10 +118,12 @@ export const CodeBlock = memo(function CodeBlock({
           code={code}
           infostring={infostring}
           showDiagram={showDiagram}
-          onToggleDiagram={isMermaid ? () => setShowDiagram((show) => !show) : undefined}
+          onToggleDiagram={
+            allowCodePreviews && isMermaid ? () => setShowDiagram((show) => !show) : undefined
+          }
         />
       </div>
-      {isMermaid && showDiagram ? (
+      {allowCodePreviews && isMermaid && showDiagram ? (
         <MermaidDiagram code={code} loading={loading} />
       ) : (
         <pre dangerouslySetInnerHTML={{ __html: renderedHtml }} />

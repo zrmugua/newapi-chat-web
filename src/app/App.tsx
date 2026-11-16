@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { useTranslate } from '../i18n/index.js'
-import { useSettings } from '../services/settings.js'
+import { resolveAvailableModel, setModel, useSettings } from '../services/settings.js'
 import { loadModels } from '../services/api/client.js'
 import { useIsMobile, useMobileViewport, usePreventPageScroll } from './viewport.js'
 import {
@@ -66,6 +66,11 @@ export const App = () => {
       .then((models) => {
         if (!controller.signal.aborted) {
           useSettings.setState({ models })
+          const currentModel = useSettings.getState().model
+          const availableModel = resolveAvailableModel(currentModel, models)
+          if (availableModel && availableModel !== currentModel) {
+            setModel(availableModel)
+          }
         }
       })
       .catch(() => {
