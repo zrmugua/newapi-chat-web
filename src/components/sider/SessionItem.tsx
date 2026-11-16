@@ -56,29 +56,32 @@ export const SessionItem = memo(function SessionItem({
       }}
     >
       <div className={styles.title}>{displayTitle}</div>
-      <div className={styles.action} onClick={(event) => event.stopPropagation()}>
-        <Menu
-          options={[
-            {
-              key: 'rename',
-              label: t('sessionItemMenuRenameOption'),
-              icon: <IconEditOutline16 />,
-              onSelect: () => setEditing(true),
-            },
-            {
-              key: 'delete',
-              label: t('delete'),
-              icon: <IconTrashOutline16 />,
-              danger: true,
-              onSelect: onDelete,
-            },
-          ]}
-        >
-          {({ toggle }) => (
+      <Menu
+        options={[
+          {
+            key: 'rename',
+            label: t('sessionItemMenuRenameOption'),
+            icon: <IconEditOutline16 />,
+            onSelect: () => setEditing(true),
+          },
+          {
+            key: 'delete',
+            label: t('delete'),
+            icon: <IconTrashOutline16 />,
+            danger: true,
+            onSelect: onDelete,
+          },
+        ]}
+      >
+        {({ open, toggle }) => (
+          <div
+            className={clsx(styles.action, open && styles.actionOpen)}
+            onClick={(event) => event.stopPropagation()}
+          >
             <IconButton icon={<IconEllipsisOutline16 />} aria-label={t('more')} onClick={toggle} />
-          )}
-        </Menu>
-      </div>
+          </div>
+        )}
+      </Menu>
     </div>
   )
 })
