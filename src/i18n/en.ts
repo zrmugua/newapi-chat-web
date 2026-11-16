@@ -7,7 +7,6 @@ export const en = {
   inputTokens: 'Input',
   outputTokens: 'Output',
   usageUnavailable: 'The API did not return token usage for this request',
-  copyMarkdown: 'Copy Markdown',
   deleteMessageRound: 'Delete this turn',
   messageDeleted: 'Turn deleted',
   undo: 'Undo',

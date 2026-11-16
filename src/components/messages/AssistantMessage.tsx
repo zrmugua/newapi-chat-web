@@ -2,7 +2,6 @@ import { useTranslate } from '../../i18n/index.js'
 import clsx from 'clsx'
 import { memo } from 'react'
 import { IconRefreshOutline16, IconWarningOutline16, IconTrashOutline16 } from '../base/icons.js'
-import { CodeIcon } from '../base/ActionIcons.js'
 import { describeReply } from '../../services/chat/describe.js'
 import { canContinueReply } from '../../services/chat/reply.js'
 import { continueReply, regenerateReply, deleteMessageRound } from '../../services/chat/store.js'
@@ -146,9 +145,6 @@ export const AssistantMessage = memo(function AssistantMessage({
             <BranchSwitcher versions={versions} disabled={busy} onSelect={onSelectVersion} />
             <div className={clsx(styles.actions, isLast && styles.alwaysShow)}>
               {copyText ? <CopyButton text={copyText} /> : null}
-              {answer?.markdown ? (
-                <CopyButton text={answer.markdown} icon={<CodeIcon />} label={t('copyMarkdown')} />
-              ) : null}
               <IconButton
                 icon={<IconRefreshOutline16 />}
                 tooltip={t('regenerate')}

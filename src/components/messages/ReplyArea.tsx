@@ -1,6 +1,6 @@
 import { useTranslate } from '../../i18n/index.js'
 import clsx from 'clsx'
-import { memo, useEffect, useState, type ReactNode } from 'react'
+import { memo, useEffect, useRef, useState, type ReactNode } from 'react'
 import {
   IconBrowseOutline16,
   IconBrowseWarningOutline16,
@@ -66,7 +66,14 @@ export const ReplyArea = memo(function ReplyArea({
 }) {
   useTranslate()
   const [open, setOpen] = useState(true)
+  const wasStreaming = useRef(streaming)
   const titleActive = streaming && !hasResponse
+  useEffect(() => {
+    if (streaming !== wasStreaming.current) {
+      setOpen(streaming)
+      wasStreaming.current = streaming
+    }
+  }, [streaming])
   useTicker(titleActive, 1000)
   if (view.steps.length === 0 && !(message.thinking && streaming)) {
     return null

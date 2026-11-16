@@ -5,7 +5,6 @@ export const zh = {
   inputTokens: '输入',
   outputTokens: '输出',
   usageUnavailable: 'API 未返回本次请求的 token 用量',
-  copyMarkdown: '复制 Markdown',
   deleteMessageRound: '删除本轮对话',
   messageDeleted: '已删除本轮对话',
   undo: '撤销',
