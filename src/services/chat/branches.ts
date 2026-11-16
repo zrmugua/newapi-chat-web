@@ -115,3 +115,39 @@ export const selectVersion = (original: Session, messageId: string): Session => 
     ),
   }
 }
+
+/** Remove a question and its answer versions, keeping later turns connected to their previous answer. */
+export const removeMessageRound = (original: Session, replyId: string): Session => {
+  const session = normalizeSession(original)
+  const reply = session.messages.find(
+    (message) => message.id === replyId && message.role === 'assistant'
+  )
+  const question = session.messages.find(
+    (message) => message.id === reply?.parentId && message.role === 'user'
+  )
+  if (!reply || !question) {
+    return original
+  }
+  const answers = session.messages.filter((message) => message.parentId === question.id)
+  const removed = new Set([question.id, ...answers.map((message) => message.id)])
+  const selectedAnswer = answers.find((message) => message.id === question.selectedChildId) ?? reply
+  const continuation = selectedAnswer.selectedChildId
+  const sibling = session.messages.findLast(
+    (message) => message.parentId === question.parentId && message.id !== question.id
+  )
+  const replacement = continuation ?? sibling?.id
+  return {
+    ...session,
+    rootMessageId:
+      session.rootMessageId === question.id ? (replacement ?? null) : session.rootMessageId,
+    messages: session.messages
+      .filter((message) => !removed.has(message.id))
+      .map((message) => ({
+        ...message,
+        parentId:
+          message.parentId && removed.has(message.parentId) ? question.parentId : message.parentId,
+        selectedChildId:
+          message.selectedChildId === question.id ? replacement : message.selectedChildId,
+      })),
+  }
+}

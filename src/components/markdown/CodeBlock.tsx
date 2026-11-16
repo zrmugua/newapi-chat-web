@@ -10,6 +10,8 @@ import { IconCheckOutline16, IconCopyOutline16 } from '../base/icons.js'
 import { showToast } from '../base/toastState.js'
 import { copyText } from '../../utils/clipboard.js'
 import { MermaidDiagram } from './MermaidDiagram.js'
+import { ArtifactPreview } from './ArtifactPreview.js'
+import { previewKind } from '../../services/markdown/preview.js'
 import styles from './CodeBlock.module.css'
 
 /** 代码块标题栏：左侧语言名，右侧复制 */
@@ -80,6 +82,7 @@ export const CodeBlock = memo(function CodeBlock({
   loading?: boolean
 }) {
   const isMermaid = infostring.toLowerCase() === 'mermaid'
+  const kind = previewKind(infostring, code)
   const [showDiagram, setShowDiagram] = useState(true)
   // 语言包注册在全局 Prism 上，每次渲染直接判断；加载完成后触发一次重渲染
   const rerender = useReducer((n: number) => n + 1, 0)[1]
@@ -103,6 +106,9 @@ export const CodeBlock = memo(function CodeBlock({
     const name = lang !== null && loaded ? lang : 'plaintext'
     return Prism.highlight(code, Prism.languages[name], name)
   }, [code, lang, loaded])
+  if (kind) {
+    return <ArtifactPreview code={code} kind={kind} loading={loading} sourceHtml={renderedHtml} />
+  }
   return (
     <div className="md-code-block">
       <div className="md-code-block-banner">
@@ -116,7 +122,7 @@ export const CodeBlock = memo(function CodeBlock({
       {isMermaid && showDiagram ? (
         <MermaidDiagram code={code} loading={loading} />
       ) : (
-        <pre dangerouslySetInnerHTML={{ __html: renderedHtml }}></pre>
+        <pre dangerouslySetInnerHTML={{ __html: renderedHtml }} />
       )}
     </div>
   )

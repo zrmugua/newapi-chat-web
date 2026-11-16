@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { useTranslate } from '../../i18n/index.js'
 import { IconCheckOutline16, IconCopyOutline16 } from '../base/icons.js'
 import { IconButton } from '../base/IconButton.js'
@@ -6,7 +6,15 @@ import { showToast } from '../base/toastState.js'
 import { copyText } from '../../utils/clipboard.js'
 
 /** 复制成功后图标换成对勾 1 秒，期间再次点击不重复复制 */
-export const CopyButton = ({ text }: { text: string }) => {
+export const CopyButton = ({
+  text,
+  icon,
+  label,
+}: {
+  text: string
+  icon?: ReactNode
+  label?: string
+}) => {
   const t = useTranslate()
   const [copied, setCopied] = useState(false)
   const timerRef = useRef<ReturnType<typeof setTimeout>>(undefined)
@@ -14,8 +22,8 @@ export const CopyButton = ({ text }: { text: string }) => {
 
   return (
     <IconButton
-      icon={copied ? <IconCheckOutline16 /> : <IconCopyOutline16 />}
-      tooltip={t('copy')}
+      icon={copied ? <IconCheckOutline16 /> : (icon ?? <IconCopyOutline16 />)}
+      tooltip={copied ? t('copied') : (label ?? t('copy'))}
       tooltipPlacement="bottom"
       onClick={async () => {
         if (copied) {

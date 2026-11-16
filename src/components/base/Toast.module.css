@@ -53,6 +53,22 @@
   }
 }
 
+.undo {
+  display: inline-flex;
+  margin-left: 14px;
+  padding: 1px 6px;
+  border: 0;
+  border-radius: 5px;
+  color: var(--dsw-static-blue-400);
+  background: transparent;
+  font: inherit;
+  cursor: pointer;
+  pointer-events: auto;
+}
+.undo:hover {
+  background: #ffffff12;
+}
+
 @keyframes enter {
   from {
     opacity: 0;

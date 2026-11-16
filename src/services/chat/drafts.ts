@@ -48,13 +48,7 @@ export const setDraftText = (sessionId: string | null, text: string) =>
 
 const upload = (attachment: DraftAttachment, apiKey: string) => {
   // 上传任务负责记录错误，输入框的附件卡片展示失败及重试入口。
-  void uploadAttachment(
-    apiKey,
-    attachment.id,
-    attachment.file,
-    attachment.file.name,
-    attachment.isImage
-  ).catch(() => {})
+  void uploadAttachment(apiKey, attachment.id).catch(() => {})
 }
 
 /** 整批校验通过后才创建预览和开始上传。 */

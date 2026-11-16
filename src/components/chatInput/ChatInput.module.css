@@ -201,11 +201,6 @@
   }
 }
 
-/* 录音中由频谱接管第一行，隐藏正文但保留高度 */
-.textareaHidden {
-  visibility: hidden;
-}
-
 @media not all and (min-width: 440px) {
   .textarea,
   .mirror {
@@ -249,52 +244,6 @@
   align-items: center;
   gap: 10px;
   min-width: 0;
-}
-
-.collapsedToggles .toggleLabel {
-  display: none;
-}
-
-.toggle {
-  display: inline-flex;
-  flex-shrink: 0;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  height: 34px;
-  padding: 0 12px;
-  border-radius: 18px;
-  border: 1px solid var(--dsw-alias-border-l2);
-  background-color: transparent;
-  color: var(--dsw-alias-label-primary);
-  font: inherit;
-  font-size: 13px;
-  line-height: 20px;
-  font-weight: 500;
-  white-space: nowrap;
-  cursor: pointer;
-  user-select: none;
-  transition-property: border, background;
-  transition-duration: 0.2s;
-
-  &:hover:not(:disabled) {
-    background-color: var(--dsw-alias-interactive-bg-hover);
-  }
-
-  &:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-  }
-
-  &.selected {
-    background-color: var(--dsw-alias-button-ghost-active-fill);
-    color: var(--dsw-alias-brand-text);
-    border-color: var(--dsw-alias-button-ghost-active-border);
-
-    &:hover {
-      background-color: var(--dsw-alias-button-ghost-active-hover);
-    }
-  }
 }
 
 .right {

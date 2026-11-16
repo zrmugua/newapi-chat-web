@@ -376,7 +376,7 @@ export const getAreaTitle = (
   if (hasResponse) {
     const count = getTotalThinkingSeconds(view.steps, now)
     if (count === null) {
-      return translate('thinkingSwitch')
+      return translate('messageThinking')
     }
     return translate(count === 1 ? 'messageThinkDuration' : 'messageThinkDurationPlural', { count })
   }

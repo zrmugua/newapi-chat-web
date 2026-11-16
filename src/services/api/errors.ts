@@ -2,7 +2,7 @@ import { ApiError } from './client.js'
 
 /**
  * 接口失败的统一分类。各调用方按自己的场景给同一种情况配不同文案，
- * 例如余额不足在回答、上传、朗读里措辞不同，所以这里只归类，不生成文案。
+ * 按鉴权、配额、限流和网络等原因归类，由界面生成文案。
  */
 export type ApiErrorCondition =
   | 'unauthorized'

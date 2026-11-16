@@ -1,4 +1,7 @@
 declare const styles: {
+  readonly "prefix": string;
+  readonly "value": string;
+  readonly "checkSpace": string;
   readonly "trigger": string;
   readonly "open": string;
   readonly "placeholder": string;

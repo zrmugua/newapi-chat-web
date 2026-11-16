@@ -1,12 +1,12 @@
 import clsx from 'clsx'
 import { useTranslate } from '../../i18n/index.js'
 import { IconToastError16 } from './icons.js'
-import { useToast } from './toastState.js'
+import { dismissToast, useToast } from './toastState.js'
 import styles from './Toast.module.css'
 
 export const Toast = () => {
   const t = useTranslate()
-  const { id, message } = useToast()
+  const { id, message, action } = useToast()
   if (!message) {
     return null
   }
@@ -33,6 +33,18 @@ export const Toast = () => {
           </a>
         ) : null}
       </span>
+      {action ? (
+        <button
+          className={styles.undo}
+          type="button"
+          onClick={() => {
+            dismissToast()
+            action.onClick()
+          }}
+        >
+          {t(action.label)}
+        </button>
+      ) : null}
     </div>
   )
 }

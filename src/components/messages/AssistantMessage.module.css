@@ -83,21 +83,40 @@
 
 .bottom {
   position: relative;
-  left: -6px;
+  left: -4px;
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 10px;
-  padding-top: 12px;
+  gap: 8px;
+  padding-top: 6px;
   padding-bottom: 10px;
 }
 
 .actions {
   display: flex;
   align-items: center;
-  gap: 10px;
-  opacity: 0;
-  transition: opacity var(--ds-transition-duration) var(--ds-ease-in-out);
+  gap: 4px;
+  opacity: 1;
+
+  :global(button) {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    color: var(--dsw-alias-label-tertiary);
+    transition:
+      background-color 120ms ease,
+      transform 120ms ease;
+  }
+  :global(button:active:not(:disabled)) {
+    transform: scale(0.95);
+  }
+  :global(button:hover:not(:disabled)) {
+    color: var(--dsw-alias-label-primary);
+  }
+  :global(svg) {
+    width: 17px;
+    height: 17px;
+  }
 }
 
 .alwaysShow {

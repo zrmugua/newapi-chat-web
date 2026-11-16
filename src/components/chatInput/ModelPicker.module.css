@@ -1,0 +1,27 @@
+.picker {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  max-width: min(220px, 38vw);
+  height: 34px;
+  padding: 0 32px 0 10px;
+  overflow: hidden;
+  border: 0;
+  border-radius: 10px;
+  color: var(--dsw-alias-label-secondary);
+  background: transparent;
+  font: inherit;
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--dsw-alias-interactive-bg-hover);
+  }
+  & > span:first-child {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}

@@ -1,10 +1,6 @@
-/**
- * Messages API（Anthropic 兼容格式）协议类型，只取本应用用到的部分。
- * 文档：https://api-docs.deepseek.com/zh-cn/api/create-message
- * 声明 deepseek_web_search / deepseek_read_url 或设置 safety_check.level 为 high 时进入扩展模式。
- */
+/** Internal content blocks shared by rendering, local history and both OpenAI-compatible transports. */
 
-export type ChatModel = 'deepseek-flash' | 'deepseek-v4-pro'
+export type ChatModel = string
 
 // ---------- 响应：内容块 ----------
 
@@ -173,13 +169,11 @@ export type DeepseekReadUrlTool = {
 }
 
 export type CreateMessageRequest = {
+  protocol?: import('../connection.js').ApiProtocol
+  reasoningEffort?: import('../connection.js').ReasoningEffort
   model: ChatModel
   system: string
   messages: MessageParam[]
-  thinking: { type: 'enabled' | 'disabled' }
-  tools: (DeepseekWebSearchTool | DeepseekReadUrlTool)[]
-  safety_check: { level: 'high' }
-  title?: { enabled: boolean }
 }
 
 // ---------- 响应：流式事件 ----------

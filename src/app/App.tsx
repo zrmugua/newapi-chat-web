@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { useTranslate } from '../i18n/index.js'
 import { useSettings } from '../services/settings.js'
+import { loadModels } from '../services/api/client.js'
 import { useIsMobile, useMobileViewport, usePreventPageScroll } from './viewport.js'
 import {
   bindChatPersistence,
@@ -20,7 +21,6 @@ import { Toast } from '../components/base/Toast.js'
 import { showToast } from '../components/base/toastState.js'
 import { onUploadNotice } from '../services/attachments.js'
 import { Button } from '../components/base/Button.js'
-import { stopReadAloud } from '../services/speech/readAloud.js'
 import { CollapsedSider } from '../components/sider/CollapsedSider.js'
 import { closeMobileSider } from '../components/sider/mobileSiderState.js'
 import { MobileSider, Sider } from '../components/sider/Sider.js'
@@ -30,6 +30,8 @@ export const App = () => {
   const t = useTranslate()
   const isMobile = useIsMobile()
   const locale = useSettings((state) => state.locale)
+  const baseUrl = useSettings((state) => state.baseUrl)
+  const apiKey = useSettings((state) => state.apiKey)
   // 移动端侧边栏以独立抽屉管理开合状态
   const siderCollapsed = useSettings((state) => state.siderCollapsed) && !isMobile
   const ready = useChatStore((state) => state.ready)
@@ -55,6 +57,22 @@ export const App = () => {
   useEffect(() => {
     document.documentElement.lang = locale
   }, [locale])
+  useEffect(() => {
+    if (!apiKey || !baseUrl) {
+      return
+    }
+    const controller = new AbortController()
+    void loadModels({ baseUrl, apiKey }, controller.signal)
+      .then((models) => {
+        if (!controller.signal.aborted) {
+          useSettings.setState({ models })
+        }
+      })
+      .catch(() => {
+        /* Manual model IDs remain available when model discovery is restricted. */
+      })
+    return () => controller.abort()
+  }, [apiKey, baseUrl])
 
   // 文件数、存储空间达到上限时，附件上只显示「上传失败」，原因用 toast 说明
   useEffect(() => onUploadNotice(showToast), [])
@@ -62,8 +80,6 @@ export const App = () => {
 
   // 搜索结果面板只属于当前会话
   useEffect(closeSearchPanel, [activeId])
-  // 切换会话时停止朗读
-  useEffect(stopReadAloud, [activeId])
   // 移动端选中会话、切换布局后收起抽屉
   useEffect(closeMobileSider, [activeId, isMobile])
 

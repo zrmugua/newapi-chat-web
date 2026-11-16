@@ -1,21 +1,53 @@
 import { create } from 'zustand'
 import type { LinkedMessage, TranslationMessage } from '../i18n/index.js'
-import { uploadFile } from './api/client.js'
 import { classifyApiError, getUploadErrorInfo, isRetryableApiError } from './api/errors.js'
 import type { FilePurpose } from './api/types.js'
-import { ACCEPT_FILE_EXTS } from './uploadExts.js'
 
 /** 允许上传的扩展名，按扩展名白名单过滤，清单见 uploadExts.ts */
-export const ACCEPTED_EXTS = ACCEPT_FILE_EXTS
+export const ACCEPTED_EXTS = [
+  'png',
+  'jpg',
+  'jpeg',
+  'gif',
+  'webp',
+  'txt',
+  'md',
+  'csv',
+  'tsv',
+  'html',
+  'htm',
+  'svg',
+  'json',
+  'xml',
+  'yaml',
+  'yml',
+  'js',
+  'jsx',
+  'ts',
+  'tsx',
+  'css',
+  'py',
+  'go',
+  'rs',
+  'java',
+  'c',
+  'h',
+  'cpp',
+  'cs',
+  'sh',
+  'sql',
+  'toml',
+  'ini',
+  'log',
+]
 /** 选择文件对话框的过滤条件 */
 export const ACCEPT = ACCEPTED_EXTS.map((ext) => `.${ext}`).join(',')
 /** 单文件大小上限与 Files API 一致 */
-export const MAX_SIZE_MB = 64
+export const MAX_SIZE_MB = 10
 /** 按 user_data 上传的文件（纯文本、代码、表格、电子书）原文件上限更小 */
-export const MAX_USER_DATA_SIZE_MB = 32
+export const MAX_USER_DATA_SIZE_MB = 10
 export const MAX_COUNT = 50
 /** 同时上传的文件数 */
-const MAX_CONCURRENT = 3
 
 /** 文件扩展名（小写，不含点）；没有扩展名时为空 */
 export const getFileExt = (name: string) => {
@@ -45,7 +77,7 @@ const getMaxSizeMB = (file: File) =>
 /** 添加前校验：格式 → 大小 → 数量，任一不满足即整批不添加 */
 export const validateFiles = (files: File[], currentCount: number): TranslationMessage | null => {
   if (files.some((file) => !isAcceptedExt(file.name))) {
-    return { key: 'uploadUnsupportedFormat' }
+    return { key: 'compatibleAttachmentTypes' }
   }
   const oversized = files.find((file) => file.size > getMaxSizeMB(file) * 1024 * 1024)
   if (oversized) {
@@ -98,48 +130,6 @@ export const describeUploadQuota = (error: unknown): LinkedMessage | undefined =
   return undefined
 }
 
-type Job = () => Promise<void>
-const queue: Job[] = []
-let running = 0
-
-const next = () => {
-  while (running < MAX_CONCURRENT) {
-    const job = queue.shift()
-    if (!job) {
-      return
-    }
-    running++
-    void job().finally(() => {
-      running--
-      next()
-    })
-  }
-}
-
-/** 排队上传，最多同时上传 MAX_CONCURRENT 个；排队期间中止的任务不会发出请求 */
-const enqueueUpload = (
-  apiKey: string,
-  file: Blob,
-  name: string,
-  isImage: boolean,
-  signal: AbortSignal
-) =>
-  new Promise<string>((resolve, reject) => {
-    queue.push(async () => {
-      if (signal.aborted) {
-        reject(signal.reason)
-        return
-      }
-      try {
-        const body = file instanceof File ? file : new File([file], name, { type: file.type })
-        resolve((await uploadFile(apiKey, body, getUploadPurpose(name, isImage), signal)).id)
-      } catch (error) {
-        reject(error)
-      }
-    })
-    next()
-  })
-
 /**
  * 上传任务按附件的本地 id 登记：输入框选中即开始上传，全部成功后携带 serverId 发送，
  * 不会重复上传；导入的历史附件没有任务，发送前按本地原件补传。
@@ -164,20 +154,14 @@ const setTask = (id: string, task: UploadTask | null) =>
 const pending = new Map<string, { promise: Promise<string>; controller: AbortController }>()
 
 /** 开始（或复用进行中的）上传，返回服务端 file_id；失败时任务记为 error 并抛出原错误 */
-export const uploadAttachment = (
-  apiKey: string,
-  id: string,
-  blob: Blob,
-  name: string,
-  isImage: boolean
-): Promise<string> => {
+export const uploadAttachment = (_apiKey: string, id: string): Promise<string> => {
   const current = pending.get(id)
   if (current) {
     return current.promise
   }
   const controller = new AbortController()
   setTask(id, { status: 'uploading' })
-  const promise = enqueueUpload(apiKey, blob, name, isImage, controller.signal)
+  const promise = Promise.resolve(`local:${id}`)
     .then((serverId) => {
       setTask(id, { status: 'done', serverId })
       return serverId
@@ -222,7 +206,8 @@ const MIME_BY_EXT: Record<string, string> = {
 /** 取文件的 MIME：优先用浏览器给出的类型，缺失时按扩展名推断 */
 export const resolveMimeType = (file: File) => file.type || MIME_BY_EXT[getFileExt(file.name)] || ''
 
-export const isImage = (mimeType: string) => mimeType.startsWith('image/')
+export const isImage = (mimeType: string) =>
+  ['image/png', 'image/jpeg', 'image/gif', 'image/webp'].includes(mimeType)
 
 /** 文件扩展名（大写），用于卡片元信息 */
 export const getExtension = (name: string) => {

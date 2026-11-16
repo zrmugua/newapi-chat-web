@@ -16,8 +16,8 @@ import type {
 } from './types.js'
 
 /**
- * 文件按 Files API 的 file_id（附件的 serverId）引用：图片用 image 块，其余用 document 块。
- * 发送前 streamReply 会先补齐 serverId；仍为 null 的是本地没有原件的附件，不进入请求。
+ * 附件通过本地引用组成内容块，图片用 image 块，文本用 document 块。
+ * API 适配层读取原件，转换为所选接口协议的内联内容。
  */
 const toFileBlocks = (files: FileAttachment[]): FileBlockParam[] =>
   files.flatMap(({ serverId, isImage }) =>
@@ -185,8 +185,7 @@ export const canContinueReply = (reply: AssistantMessage): boolean => {
     return false
   }
   return (
-    reply.status === 'stopped' ||
-    (reply.status === 'done' && reply.stopReason === 'max_tokens')
+    reply.status === 'stopped' || (reply.status === 'done' && reply.stopReason === 'max_tokens')
   )
 }
 

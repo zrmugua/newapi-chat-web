@@ -12,7 +12,7 @@ import type {
 /**
  * 消息附件。id 是本地标识（IndexedDB files 表的主键，原件按它存储，所有引用同一 id 的消息共用一份），
  * 导入的附件沿用导出产物里的文件 ID；本地没有原件的附件只展示文件名，不进入请求。
- * serverId 是 Files API 返回的 file_id，导入的数据或尚未上传成功的文件为 null，发送前补传。
+ * serverId 保存本地附件引用；API 请求从 IndexedDB 读取原件并转换为内联内容。
  */
 export type FileAttachment = {
   id: string
@@ -72,6 +72,10 @@ export type ReplyBlock = ThinkingPart | TextPart | ServerToolBlock
 export type ReplyStatus = 'pending' | 'streaming' | 'done' | 'stopped' | 'error'
 
 export type AssistantMessage = MessageBranch & {
+  requestStartedAt?: number
+  durationMs?: number
+  protocol?: import('../connection.js').ApiProtocol
+  reasoningEffort?: import('../connection.js').ReasoningEffort
   id: string
   role: 'assistant'
   createdAt: number

@@ -1,11 +1,11 @@
 import { useTranslate } from '../../i18n/index.js'
 import clsx from 'clsx'
 import { memo } from 'react'
-import { IconRefreshOutline16, IconWarningOutline16 } from '../base/icons.js'
+import { IconRefreshOutline16, IconWarningOutline16, IconTrashOutline16 } from '../base/icons.js'
+import { CodeIcon } from '../base/ActionIcons.js'
 import { describeReply } from '../../services/chat/describe.js'
 import { canContinueReply } from '../../services/chat/reply.js'
-import { continueReply, regenerateReply } from '../../services/chat/store.js'
-import { stopReadAloud } from '../../services/speech/readAloud.js'
+import { continueReply, regenerateReply, deleteMessageRound } from '../../services/chat/store.js'
 import type { AssistantMessage as AssistantMessageType } from '../../services/chat/types.js'
 import { openSettings } from '../settings/settingsDialogState.js'
 import { IconButton } from '../base/IconButton.js'
@@ -13,8 +13,10 @@ import { Button } from '../base/Button.js'
 import { Markdown } from '../markdown/Markdown.js'
 import { SiteThumbnails } from '../search/SiteLogo.js'
 import { toggleSearchPanel, useSearchPanel } from '../search/searchPanelState.js'
-import { ReadAloudButton } from './ReadAloudButton.js'
+import { useSettings } from '../../services/settings.js'
 import { CopyButton } from './CopyButton.js'
+import { RequestStats } from './RequestStats.js'
+import { showToast } from '../base/toastState.js'
 import { ReplyArea } from './ReplyArea.js'
 import { useReplyView } from './useReplyView.js'
 import {
@@ -23,8 +25,6 @@ import {
   type SelectMessageVersion,
 } from './BranchSwitcher.js'
 import styles from './AssistantMessage.module.css'
-
-const TOP_UP_URL = 'https://platform.deepseek.com/top_up'
 
 export const AssistantMessage = memo(function AssistantMessage({
   sessionId,
@@ -44,6 +44,7 @@ export const AssistantMessage = memo(function AssistantMessage({
   onSelectVersion: SelectMessageVersion
 }) {
   const t = useTranslate()
+  const baseUrl = useSettings((state) => state.baseUrl)
   const view = useReplyView(message, streaming)
   const panelEntry = useSearchPanel((state) => state.entry)
   const notice = streaming ? null : describeReply(message)
@@ -102,7 +103,7 @@ export const AssistantMessage = memo(function AssistantMessage({
                 <button
                   type="button"
                   className={styles.noticeAction}
-                  onClick={() => openSettings('data')}
+                  onClick={() => openSettings('connection')}
                 >
                   {t('changeApiKey')}
                 </button>
@@ -113,7 +114,7 @@ export const AssistantMessage = memo(function AssistantMessage({
                 {' '}
                 <a
                   className={styles.noticeAction}
-                  href={TOP_UP_URL}
+                  href={baseUrl ? new URL(baseUrl).origin + '/console/topup' : '#'}
                   target="_blank"
                   rel="noreferrer"
                 >
@@ -139,39 +140,62 @@ export const AssistantMessage = memo(function AssistantMessage({
         </div>
       ) : null}
       {streaming ? null : (
-        <div className={styles.bottom}>
-          <BranchSwitcher versions={versions} disabled={busy} onSelect={onSelectVersion} />
-          <div className={clsx(styles.actions, isLast && styles.alwaysShow)}>
-            {copyText ? <CopyButton text={copyText} /> : null}
-            {responseText && !refused ? (
-              <ReadAloudButton messageId={message.id} text={responseText} />
+        <>
+          <RequestStats message={message} />
+          <div className={styles.bottom}>
+            <BranchSwitcher versions={versions} disabled={busy} onSelect={onSelectVersion} />
+            <div className={clsx(styles.actions, isLast && styles.alwaysShow)}>
+              {copyText ? <CopyButton text={copyText} /> : null}
+              {answer?.markdown ? (
+                <CopyButton text={answer.markdown} icon={<CodeIcon />} label={t('copyMarkdown')} />
+              ) : null}
+              <IconButton
+                icon={<IconRefreshOutline16 />}
+                tooltip={t('regenerate')}
+                tooltipPlacement="bottom"
+                disabled={busy || refused}
+                onClick={() => {
+                  regenerateReply(sessionId, message.id)
+                }}
+              />
+              <IconButton
+                icon={<IconTrashOutline16 />}
+                tooltip={t('deleteMessageRound')}
+                tooltipPlacement="bottom"
+                disabled={busy}
+                onClick={() => {
+                  const undo = deleteMessageRound(sessionId, message.id)
+                  if (undo) {
+                    showToast(
+                      { key: 'messageDeleted' },
+                      {
+                        label: 'undo',
+                        onClick: () => {
+                          if (!undo()) {
+                            showToast({ key: 'undoUnavailable' })
+                          }
+                        },
+                      }
+                    )
+                  }
+                }}
+              />
+            </div>
+            {isLast && canContinueReply(message) ? (
+              <Button
+                variant="outlined"
+                size="s"
+                className={styles.continueButton}
+                disabled={busy}
+                onClick={() => {
+                  continueReply(sessionId, message.id)
+                }}
+              >
+                {t('continueGenerating')}
+              </Button>
             ) : null}
-            <IconButton
-              icon={<IconRefreshOutline16 />}
-              tooltip={t('regenerate')}
-              tooltipPlacement="bottom"
-              disabled={busy || refused}
-              onClick={() => {
-                stopReadAloud()
-                regenerateReply(sessionId, message.id)
-              }}
-            />
           </div>
-          {isLast && canContinueReply(message) ? (
-            <Button
-              variant="outlined"
-              size="s"
-              className={styles.continueButton}
-              disabled={busy}
-              onClick={() => {
-                stopReadAloud()
-                continueReply(sessionId, message.id)
-              }}
-            >
-              {t('continueGenerating')}
-            </Button>
-          ) : null}
-        </div>
+        </>
       )}
     </div>
   )

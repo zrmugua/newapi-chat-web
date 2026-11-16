@@ -1,14 +1,15 @@
 {
-  "name": "chat-demo",
+  "name": "newapi-chat-web",
   "version": "0.1.1",
-  "description": "基于 DeepSeek API 的静态聊天示例。",
+  "description": "面向 New API 中转站的聊天网页，支持 Chat Completions、Responses 与 HTML / SVG 实时预览。",
   "license": "MIT",
   "private": true,
   "type": "module",
   "scripts": {
     "dev": "rspack serve -c rspack.config.ts",
-    "build": "rm -rf dist && NODE_ENV=production rspack build -c rspack.config.ts",
+    "build": "node scripts/build.mjs",
     "type": "tsc -p tsconfig.json",
+    "test": "tsx --test tests/*.test.ts",
     "lint": "oxlint src rspack.config.ts",
     "format": "oxfmt --write ."
   },
@@ -42,6 +43,7 @@
     "@types/node": "~20.9.2",
     "oxfmt": "0.48.0",
     "oxlint": "1.63.0",
+    "tsx": "^4.23.15",
     "typescript": "7.0.2"
   }
 }
